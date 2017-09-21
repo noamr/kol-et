@@ -32,7 +32,7 @@ function midi2cmds(midiFile) {
         }
     })
 
-    return commands.sort((a, b) => a.ts - b.ts)
+    return commands.sort((a, b) => a.ts - b.ts).map(cmd => Object.assign(cmd, {ts: Math.floor(cmd.ts / 1000)}))
 }
 
 module.exports = midi2cmds

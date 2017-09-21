@@ -2,14 +2,14 @@ const fs = require('fs')
 const usleep = require('sleep').usleep
 
 function playCommands(commands, callbacks) {
-    const startTime = Date.now() * 1000
+    const startTime = Date.now()
 
     function playNext() {
-        const now = Date.now() * 1000
+        const now = Date.now()
         while (commands.length) {
             const designatedTime = commands[0].ts + startTime
             if (designatedTime > now) {
-                setTimeout(playNext, (designatedTime - now) / 1000)            
+                setTimeout(playNext, designatedTime - now)          
                 break;
             }
             const cmd = commands.splice(0, 1)[0]
