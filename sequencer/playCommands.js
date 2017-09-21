@@ -1,27 +1,33 @@
 const fs = require('fs')
 const usleep = require('sleep').usleep
 
-function playCommands(commands) {
+function playCommands(commands, callbacks) {
     const startTime = Date.now() * 1000
-    commands.forEach(cmd => {
-        const now = Date.now() * 1000
-        const designatedTime = cmd.ts + startTime
-        if (designatedTime > now) {
-            usleep(designatedTime - now)            
-        }
 
-        switch (cmd.cmd) {
-            case "NOTE":
-                process.stdout.write(`NOTE ${cmd.arg.channel} ${cmd.arg.note}\n`)
-                break
-            case "BEAT":
-                process.stdout.write(`BEAT\n`)
-                break
-            case "AUDIO":
-                process.stdout.write(`AUDIO\n`)
-                break
+    function playNext() {
+        const now = Date.now() * 1000
+        while (commands.length) {
+            const designatedTime = commands[0].ts + startTime
+            if (designatedTime > now) {
+                setTimeout(playNext, (designatedTime - now) / 1000)            
+                break;
+            }
+            const cmd = commands.splice(0, 1)[0]
+            switch (cmd.cmd) {
+                case 'AUDIO':
+                    callbacks.onAudio();
+                    break;
+                case 'BEAT':
+                    callbacks.onBeat();
+                    break;
+                case 'NOTE':
+                    callbacks.onNote(cmd.arg.note, cmd.arg.channel);
+                    break;
+            }    
         }
-    })
+    }
+
+    playNext()
 }
 
 module.exports = playCommands

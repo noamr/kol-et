@@ -10,9 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "command-line-args": "^4.0.7",
+    "lame": "^1.2.4",
     "midi-converter": "^0.1.5",
     "play-sound": "^1.1.1",
     "readtoend": "0.0.1",
-    "sleep": "^5.1.1"
+    "sleep": "^5.1.1",
+    "speaker": "^0.4.0"
   }
 }
