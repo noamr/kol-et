@@ -1,13 +1,13 @@
 const midiToJson = require('midi-converter').midiToJson
 
-function midi2cmds(midiFile) {
+function midi2cmds(midiFile, {delay}) {
     const song = midiToJson(midiFile)
     const ticksPerBeat = song.header.ticksPerBeat
     let microsecondsPerBeat = 500000
     let timestamp = 0
     const commands = []
     const tempos = []
-    const addCommand = (cmd, arg) => commands.push({ts: Math.floor(timestamp), cmd, arg})
+    const addCommand = (cmd, arg) => commands.push({ts: Math.floor(timestamp - delay), cmd, arg})
     song.tracks[0].forEach(command => {
         timestamp += command.deltaTime * microsecondsPerBeat / ticksPerBeat
         switch (command.subtype) {
