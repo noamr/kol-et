@@ -10,7 +10,6 @@ async function octopus() {
             }
     
             function sendCommand(cmd) {
-                console.log(cmd);
                 return new Promise(resolve => {
                     port.write(new Buffer(`M*${cmd}\n`, 'ascii'), resolve)    
                 })

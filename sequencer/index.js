@@ -28,23 +28,16 @@ const optionDefinitions = [
         playCommands(commands, {
             onBeat: () => {
                 if (options.playBeats) {
-                    octopus.beat();                    
+                    return octopus.beat();                    
                 }
                 console.log('BEAT')
             },
-            onNote: (note, channel) => {
-                octopus.note(colors[channel], channel);
-                // if (note === 45) {
-                //     octopus.note('c', 2);                    
-                // }
-                // if (note === 37) {
-                //     octopus.note('d', 3);                    
-                // }
-                console.log(`NOTE ${note} ${channel}`)            
+            onNote: (channel) => {
+                return octopus.note(colors[channel], channel);
             },
             onAudio: () => {
                 if (options.audioFile) {
-                    playAudio(options.audioFile)
+                    return playAudio(options.audioFile)
                 }
         }})
     }    

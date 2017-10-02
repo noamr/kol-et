@@ -1,25 +1,37 @@
 const midiToJson = require('midi-converter').midiToJson
+const _ = require('lodash')
 
 function midi2cmds(midiFile, {delay}) {
     const song = midiToJson(midiFile)
     const ticksPerBeat = song.header.ticksPerBeat
     let microsecondsPerBeat = 500000
-    let timestamp = 0
     const commands = []
     const tempos = []
-    const addCommand = (cmd, arg) => commands.push({ts: Math.floor(timestamp - delay), cmd, arg})
-    song.tracks[0].forEach(command => {
-        timestamp += command.deltaTime * microsecondsPerBeat / ticksPerBeat
+    const addCommand = (cmd, arg, withDelay) => commands.push({ts: Math.floor(timestamp - (withDelay ? delay : 0)), cmd, arg})
+    let firstNote = true
+
+    const flatCommands = _(song.tracks).map(
+        track => _.reduce(track, (agg, cmd) => agg.concat([_.assign({absoluteTime: _.get(_.last(agg), 'absoluteTime', 0) + cmd.deltaTime}, cmd)]), []))
+        .flatten()
+        .value()
+
+    let rawTime = 0
+    let timestamp = 0
+    flatCommands.forEach(command => {
+        const deltaTime = command.absoluteTime - rawTime
+        rawTime = command.absoluteTime
+        timestamp += deltaTime * microsecondsPerBeat / ticksPerBeat
         switch (command.subtype) {
             case "setTempo":
                 tempos.push([timestamp, command.microsecondsPerBeat])
                 microsecondsPerBeat = command.microsecondsPerBeat
                 break
             case "noteOn":
-                if (command.noteNumber === 24) {
-                    addCommand("AUDIO")
+                if (firstNote) {
+                    addCommand("AUDIO", null, false)
+                    firstNote = false
                 } else {
-                    addCommand("NOTE", {channel: command.channel, note: command.noteNumber})
+                    addCommand("NOTE", command.channel, true)
                 }
                 break
         }
