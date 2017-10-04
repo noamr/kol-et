@@ -13,34 +13,38 @@ const optionDefinitions = [
   ]
 
   async function start() {
-    const options = commandLineArgs(optionDefinitions)
-    const delay = options.delay || 1000
-    const commands = midi2cmds(fs.readFileSync(options.midiFile, 'binary'), {delay: delay * 1000})
-    const octopus = await oct()
-    octopus.demoOff()
-    octopus.setDelay(delay)
+    try {
+        const options = commandLineArgs(optionDefinitions)
+        const delay = options.delay || 1000
+        const commands = midi2cmds(fs.readFileSync(options.midiFile, 'binary'))
+        const octopus = await oct()
+        await Promise.all(new Array(4).fill(0).map(async () => await octopus.demoOff()))
+        octopus.setDelay(delay)
 
-    colors = ['b'];
+    colors = 'bcde';
+        if (options.commandFile) {
+            fs.writeFileSync(options.commandFile, JSON.stringify(commands))    
+        } else {
+            playCommands(commands, {
+                onBeat: () => {
+                    if (options.playBeats) {
+                        return octopus.beat();                    
+                    }
+                },
+                onNote: (channel) => {
+                    console.log('NOTE ' + channel)
+                    return octopus.note(colors[channel - 1], channel - 1);
+                },
+                onAudio: () => {
+                    if (options.audioFile) {
+                        return playAudio(options.audioFile)
+                    }
+            }}, {delay})
+        }        
+    } catch (e) {
+        console.error(e)
+    }
     
-    if (options.commandFile) {
-        fs.writeFileSync(options.commandFile, JSON.stringify(commands))    
-    } else {
-        playCommands(commands, {
-            onBeat: () => {
-                if (options.playBeats) {
-                    return octopus.beat();                    
-                }
-                console.log('BEAT')
-            },
-            onNote: (channel) => {
-                return octopus.note(colors[channel], channel);
-            },
-            onAudio: () => {
-                if (options.audioFile) {
-                    return playAudio(options.audioFile)
-                }
-        }})
-    }    
 }
 
 start()
