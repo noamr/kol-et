@@ -17,7 +17,6 @@ function midi2cmds(midiFile) {
 
     let rawTime = 0
     let timestamp = 0
-    console.log(flatCommands)
     flatCommands.forEach(command => {
         const deltaTime = command.absoluteTime - rawTime
         rawTime = command.absoluteTime
