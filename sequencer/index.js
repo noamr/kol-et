@@ -4,6 +4,7 @@ const midi2cmds = require('./midi2cmds')
 const playCommands = require('./playCommands')
 const playAudio = require('./audioPlayer')
 const oct = require('./octopus')
+
 const optionDefinitions = [
     { name: 'midiFile', alias: 'm', type: String },
     { name: 'commandFile', alias: 'c', type: String },
@@ -19,9 +20,9 @@ const optionDefinitions = [
         const commands = midi2cmds(fs.readFileSync(options.midiFile, 'binary'))
         const octopus = await oct()
         await Promise.all(new Array(4).fill(0).map(async () => await octopus.demoOff()))
-        octopus.setDelay(delay)
-
-    colors = 'bcde';
+        await octopus.setDelay(delay)
+        colors = ['090909', 'DD0000', '00DD00', '0000DD',  '00EE55'];
+        await Promise.all(colors.map((color, index) => octopus.defineNote(index, color)))
         if (options.commandFile) {
             fs.writeFileSync(options.commandFile, JSON.stringify(commands))    
         } else {
@@ -33,7 +34,7 @@ const optionDefinitions = [
                 },
                 onNote: (channel) => {
                     console.log('NOTE ' + channel)
-                    return octopus.note(colors[channel - 1], channel - 1);
+                    return octopus.playNote(channel - 1);
                 },
                 onAudio: () => {
                     if (options.audioFile) {

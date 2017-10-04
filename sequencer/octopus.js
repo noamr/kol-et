@@ -24,12 +24,16 @@ async function octopus() {
                     demoOff: () => sendCommand('D0'),
                     beat: () => sendCommand('naaaa'),
                     reset: () => sendCommand('r'),
-                    setDelay: ms => sendCommand(`st=${Math.floor(ms / PIXELS)}`),
-                    note: (color, channel) => {
+                    setDelay: ms => sendCommand(`sT=${Math.floor(ms / PIXELS)}`),
+                    setGoalColor: color => sendCommand(`sgc=${color}`),
+                    setScoreColor: color => sendCommand(`ssc=${color}`),
+                    setAcceptanceWindow: win => sendCommand(`ssc=${color}`),
+                    defineNote: (channel, color) => sendCommand(`d${channel}${color}`),
+                    playNote: (channel) =>
                         sendCommand('n' + new Array(4).fill('.').map((v, i) =>
-                            i == channel ? color : '.'
+                            i == channel ? (String.fromCharCode('b'.charCodeAt(0) + channel)) : '.'
                         ).join(''))
-                    }
+                    
                 })    
             })            
         });
