@@ -3,7 +3,6 @@ const fs = require('fs')
 async function playCommands(cmds, callbacks, {delay}) {
     const startTime = Date.now()
     const commands = cmds.map(c => c.type === 'AUDIO' ? c : Object.assign({}, c, {ts: c.ts - delay})).sort((a, b) => a.ts - b.ts);
-    console.log(commands)
 
     commands.forEach(async ({cmd, ts, arg}) => {
         const designatedTime = ts + startTime

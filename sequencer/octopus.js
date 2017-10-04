@@ -2,7 +2,7 @@ const SerialPort = require('serialport')
 
 async function octopus() {
     return new Promise((resolve, reject) => {
-        const port = new SerialPort(process.env.HERO_SERIAL_PATH, {baudRate: +(process.env.HERO_BAUD_RATE || 57600)})
+        const port = new SerialPort(process.env.HERO_SERIAL_PATH || '/dev/cu.wchusbserial1420', {baudRate: +(process.env.HERO_BAUD_RATE || 57600)})
         port.on('open', err => {
             if (err) {
                 console.error(err);
@@ -28,7 +28,7 @@ async function octopus() {
                     setGoalColor: color => sendCommand(`sgc=${color}`),
                     setScoreColor: color => sendCommand(`ssc=${color}`),
                     setAcceptanceWindow: win => sendCommand(`ssc=${color}`),
-                    defineNote: (channel, color) => sendCommand(`d${channel}${color}`),
+                    defineNote: (channel, color, scorable   ) => sendCommand(`d${(String.fromCharCode('a'.charCodeAt(0) + channel))}${scorable?1:0}0x${color}`),
                     playNote: (channel) =>
                         sendCommand('n' + new Array(4).fill('.').map((v, i) =>
                             i == channel ? (String.fromCharCode('b'.charCodeAt(0) + channel)) : '.'
