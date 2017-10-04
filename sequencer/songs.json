@@ -1,0 +1,11 @@
+{
+    "delay": 800,
+    "gamePath": "game",
+    "beats": false,
+    "vamp": 10000,
+    "acceptanceWindow": 15,
+    "goalColor": "102000",
+    "scoreColor": "100008",
+    "colors": ["090909", "DD0000", "00DD00", "0000DD",  "00EE55"],
+    "songs": ["agado"]
+}
